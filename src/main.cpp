@@ -42,12 +42,12 @@ int main(int argc, char *argv[]) {
     if (rpi_cam_flag == 1) {
         pipeline = "rpicamsrc ! video/x-h264 ! h264parse ! rtph264pay name=pay0";
     } else {
-        pipeline = "v4l2src ! video/x-raw,format=YUY2 ! videoconvert ! video/x-raw,format=I420 ! {} ! rtph264pay name=pay0";
+        pipeline = "v4l2src ! video/x-raw,format=YUY2,width=480,height=640 ! videoconvert ! video/x-raw,format=I420 ! {} ! rtph264pay name=pay0";
         if (use_hw_encoder == 0) {
             // don't hardware accelerate
             pipeline = fmt::format(pipeline, "x264enc tune=zerolatency");
         } else {
-            pipeline = fmt::format(pipeline, "omxh264enc");
+            pipeline = fmt::format(pipeline, "omxh264enc ! video/x-h264,profile=baseline");
         }
     }
     std::cout << "Starting pipeline: " + pipeline << std::endl;
