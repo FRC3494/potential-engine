@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
             // don't hardware accelerate
             pipeline = fmt::format(pipeline, "x264enc tune=zerolatency");
         } else {
-            pipeline = fmt::format(pipeline, "omxh264enc");
+            pipeline = fmt::format(pipeline, "video/x-raw,format=I420 ! omxh264enc");
         }
     }
     std::cout << "Starting pipeline: " + pipeline << std::endl;
