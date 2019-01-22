@@ -57,7 +57,14 @@ int main(int argc, char *argv[]) {
     }
     std::string pipeline;
     if (rpi_cam_flag == 1) {
-        pipeline = "rpicamsrc ! video/x-h264 ! h264parse ! rtph264pay name=pay0";
+        pipeline = fmt::format(
+            "rpicamsrc ! "
+            "video/x-h264,height={},framerate={}/1 ! "
+            "h264parse ! "
+            "rtph264pay name=pay0",
+            video_height,
+            framerate
+        );
     } else {
         pipeline = "v4l2src ! "
             "video/x-raw,format=YUY2,height={h},framerate={f}/1 ! "
