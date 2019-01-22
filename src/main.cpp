@@ -57,12 +57,17 @@ int main(int argc, char *argv[]) {
     }
     std::string pipeline;
     if (rpi_cam_flag == 1) {
+        std::map<std::string, std::string> resolutions;
+        resolutions["360"] = "640";
+        resolutions["480"] = "640";
+        resolutions["720"] = "1280";
         pipeline = fmt::format(
             "rpicamsrc ! "
-            "video/x-h264,height={},framerate={}/1 ! "
+            "video/x-h264,height={},width={},framerate={}/1 ! "
             "h264parse ! "
             "rtph264pay name=pay0",
             video_height,
+            resolutions[video_height],
             framerate
         );
     } else {
