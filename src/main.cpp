@@ -8,6 +8,7 @@
 static int rpi_cam_flag = 0;
 static int use_hw_encoder = 0;
 std::string video_height = "480";
+std::string framerate = "30";
 
 int main(int argc, char *argv[]) {
     GMainLoop *loop;
@@ -31,28 +32,46 @@ int main(int argc, char *argv[]) {
         {"no_rpi_cam", no_argument, &rpi_cam_flag, 0},
         {"hardware_accel", no_argument, &use_hw_encoder, 1},
         {"height", required_argument, 0, 'h'},
+        {"fps", required_argument, 0, 'f'},
         {0, 0, 0, 0}
     };
     while (1) {
         int option_index = 0;
-        int c = getopt_long(argc, argv, "", long_options, &option_index);
+        int c = getopt_long(argc, argv, "h:f:", long_options, &option_index);
         if (c == -1) {
             break;
-        } else if (c == 'h') {
-            video_height = optarg;
+        } else {
+            switch(c) {
+                case 0:
+                    if (long_options[option_index].flag != 0) {
+                        break;
+                    }
+                case 'h':
+                    video_height = optarg;
+                    break;
+                case 'f':
+                    framerate = optarg;
+                    break;
+            }
         }
     }
     std::string pipeline;
     if (rpi_cam_flag == 1) {
         pipeline = "rpicamsrc ! video/x-h264 ! h264parse ! rtph264pay name=pay0";
     } else {
-        pipeline = "v4l2src ! video/x-raw,format=YUY2,height={} ! videoconvert ! video/x-raw,format=I420 ! {} ! rtph264pay name=pay0";
+        pipeline = "v4l2src ! "
+            "video/x-raw,format=YUY2,height={h},framerate={f}/1 ! "
+            "videoconvert ! "
+            "video/x-raw,format=I420 ! "
+            "{e} ! rtph264pay name=pay0";
+        std::string encoder;
         if (use_hw_encoder == 0) {
             // don't hardware accelerate
-            pipeline = fmt::format(pipeline, video_height, "x264enc tune=zerolatency");
+            encoder = "x264enc tune=zerolatency";
         } else {
-            pipeline = fmt::format(pipeline, video_height, "omxh264enc ! video/x-h264,profile=baseline");
+            encoder = "omxh264enc ! video/x-h264,profile=baseline";
         }
+        pipeline = fmt::format(pipeline, fmt::arg("h", video_height), fmt::arg("f", framerate), fmt::arg("e", encoder));
     }
     std::cout << "Starting pipeline: " + pipeline << std::endl;
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
