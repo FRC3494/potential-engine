@@ -10,6 +10,7 @@ static int rpi_cam_flag = 0;
 static int use_hw_encoder = 0;
 std::string video_height = "480";
 std::string framerate = "30";
+std::string mount = "/test";
 
 int main(int argc, char *argv[]) {
     GMainLoop *loop;
@@ -34,6 +35,7 @@ int main(int argc, char *argv[]) {
         {"hardware_accel", no_argument, &use_hw_encoder, 1},
         {"height", required_argument, 0, 'h'},
         {"fps", required_argument, 0, 'f'},
+        {"url", required_argument, 0, 'u'},
         {0, 0, 0, 0}
     };
     while (1) {
@@ -52,6 +54,9 @@ int main(int argc, char *argv[]) {
                     break;
                 case 'f':
                     framerate = optarg;
+                    break;
+                case 'u':
+                    mount = std::string("/") + optarg;
                     break;
             }
         }
@@ -89,8 +94,8 @@ int main(int argc, char *argv[]) {
     std::cout << "Starting pipeline: " + pipeline << std::endl;
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
     // g_signal_connect (factory, "media-configure", (GCallback) media_configure, NULL);
-    // add stream at `/test`
-    gst_rtsp_mount_points_add_factory(mounts, "/test", factory);
+    // add stream at mount
+    gst_rtsp_mount_points_add_factory(mounts, mount.c_str(), factory);
     // free thing we're no longer using
     g_object_unref(mounts);
     // start rtsp server using info in server obj, ignoring errors
