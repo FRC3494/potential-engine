@@ -64,6 +64,8 @@ int main(int argc, char *argv[]) {
     std::string pipeline;
     if (rpi_cam_flag == 1) {
         std::map<std::string, std::string> resolutions;
+        resolutions["144"] = "256";
+        resolutions["240"] = "426";
         resolutions["360"] = "640";
         resolutions["480"] = "640";
         resolutions["720"] = "1280";
