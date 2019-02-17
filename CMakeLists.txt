@@ -4,6 +4,7 @@ PROJECT(camerac)
 
 SET(camerac_SOURCES
     src/main.cpp
+    src/pipe_builder.cpp
 )
 
 INCLUDE(FindPkgConfig)
