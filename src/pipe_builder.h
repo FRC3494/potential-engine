@@ -1,23 +1,11 @@
 #include <string>
 
-#ifdef DEFAULT_FPS
-std::string raspberry_pipe(const std::string height,
-    const std::string width="",
-    const std::string framerate=DEFAULT_FPS,
-    const bool preview=false
+std::string raspberry_pipe(const int* height,
+    const int* framerate,
+    const int* rotation,
+    const bool* preview
 );
-std::string v4l2_pipe(const std::string height,
-    const std::string framerate=DEFAULT_FPS,
-    const bool openmax=false
+std::string v4l2_pipe(const int* height,
+    const int* framerate,
+    const bool* openmax
 );
-#else
-std::string raspberry_pipe(const std::string height,
-    const std::string width="",
-    const std::string framerate="30",
-    const bool preview=false
-);
-std::string v4l2_pipe(const std::string height,
-    const std::string framerate="30",
-    const bool openmax=false
-);
-#endif
