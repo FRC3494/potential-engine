@@ -6,63 +6,64 @@
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
 
-static int rpi_cam_flag = 0;
-static int use_hw_encoder = 0;
-std::string video_height = "480";
-std::string framerate = "30";
-std::string mount = "/test";
+#define DEFAULT_RTSP_PORT "8554"
+#define DEFAULT_RESOLUTION "480"
+#define DEFAULT_FPS "30"
+#define DEFAULT_MOUNT "/stream"
+
+static char *port = (char *) DEFAULT_RTSP_PORT;
+
+static bool rpi_cam_flag = false;
+static bool use_hw_encoder = false;
+static std::string video_height = (char *) DEFAULT_RESOLUTION;
+static std::string framerate = (char *) DEFAULT_FPS;
+static std::string mount = (char *) DEFAULT_MOUNT;
+
+static GOptionEntry entries[] = {
+    {"rpi_cam", 'r', 0, G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
+    {"fps", 'f', 0, G_OPTION_ARG_STRING, &framerate, "Framerate in FPS (default: " DEFAULT_FPS ")", "FPS"},
+    {"use_omx", 'o', 0, G_OPTION_ARG_NONE, &use_hw_encoder, "Use OpenMAX hardware acceleration (default: false). Ignored if the Raspberry Pi Camera module is used.", NULL},
+    {"height", 'h', 0, G_OPTION_ARG_STRING, &video_height, "Video height. Should be a standard resolution (in [240, 360, 480, 720] for most cameras.)", "HEIGHT"},
+    {"url", 'u', 0, G_OPTION_ARG_STRING, &mount, "URL to stream video at. Must start with \"/\" (default: " DEFAULT_MOUNT ")", "URL"},
+    {"port", 'p', 0, G_OPTION_ARG_STRING, &port, "Port to listen on (default: " DEFAULT_RTSP_PORT ")", "PORT"},
+    {NULL}
+};
 
 int main(int argc, char *argv[]) {
     GMainLoop *loop;
     GstRTSPServer *server;
     GstRTSPMountPoints *mounts;
     GstRTSPMediaFactory *factory;
-    GSocket *socket;
-    GSource *source;
-    GError *err = NULL;
+    GOptionContext *optctx;
+    GError *error = NULL;
 
-    // pass no options to GStreamer so we can have our own
-    gst_init (NULL, NULL);
+    optctx = g_option_context_new(" - Potential Engine RTSP Server\n"
+                "\n"
+                "Copyright (C) 2019 The Quadrangles FRC Team 3494\n"
+                "This program comes with ABSOLUTELY NO WARRANTY, to the extent permitted by " 
+                "applicable law. (You have been warned!)\n"
+                "This is free software, and you are welcome to redistribute it "
+                "under certain conditions; see LICENSE for details."
+    );
+    g_option_context_add_main_entries(optctx, entries, NULL);
+    g_option_context_add_group(optctx, gst_init_get_option_group());
+    if (!g_option_context_parse (optctx, &argc, &argv, &error)) {
+        g_printerr ("Error parsing options: %s\n", error->message);
+        g_option_context_free (optctx);
+        g_clear_error (&error);
+        return -1;
+    }
+    g_option_context_free (optctx);
+
     loop = g_main_loop_new(NULL, false);
 
     server = gst_rtsp_server_new();
+    g_object_set(server, "service", port, NULL);
     mounts = gst_rtsp_server_get_mount_points(server);
     factory = gst_rtsp_media_factory_new();
-    // parse options
-    static struct option long_options[] = {
-        {"rpi_cam", no_argument, &rpi_cam_flag, 1},
-        {"no_rpi_cam", no_argument, &rpi_cam_flag, 0},
-        {"hardware_accel", no_argument, &use_hw_encoder, 1},
-        {"height", required_argument, 0, 'h'},
-        {"fps", required_argument, 0, 'f'},
-        {"url", required_argument, 0, 'u'},
-        {0, 0, 0, 0}
-    };
-    while (1) {
-        int option_index = 0;
-        int c = getopt_long(argc, argv, "h:f:u:", long_options, &option_index);
-        if (c == -1) {
-            break;
-        } else {
-            switch(c) {
-                case 0:
-                    if (long_options[option_index].flag != 0) {
-                        break;
-                    }
-                case 'h':
-                    video_height = optarg;
-                    break;
-                case 'f':
-                    framerate = optarg;
-                    break;
-                case 'u':
-                    mount = std::string("/") + optarg;
-                    break;
-            }
-        }
-    }
+    
     std::string pipeline;
-    if (rpi_cam_flag == 1) {
+    if (rpi_cam_flag) {
         std::map<std::string, std::string> resolutions;
         resolutions["144"] = "256";
         resolutions["240"] = "426";
@@ -84,25 +85,24 @@ int main(int argc, char *argv[]) {
             "videoconvert ! "
             "video/x-raw,format=I420 ! "
             "{e} ! rtph264pay name=pay0";
-        std::string encoder;
-        if (use_hw_encoder == 0) {
-            // don't hardware accelerate
-            encoder = "x264enc tune=zerolatency";
-        } else {
+        std::string encoder = "x264enc tune=zerolatency";
+        if (use_hw_encoder) {
+            // hardware accelerate
             encoder = "omxh264enc ! video/x-h264,profile=baseline";
         }
         pipeline = fmt::format(pipeline, fmt::arg("h", video_height), fmt::arg("f", framerate), fmt::arg("e", encoder));
     }
-    std::cout << "Starting pipeline: " + pipeline << std::endl;
+    
+    g_print("Starting pipline : %s", pipeline.c_str());
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
-    // g_signal_connect (factory, "media-configure", (GCallback) media_configure, NULL);
-    // add stream at mount
+    gst_rtsp_media_factory_set_shared(factory, true);
     gst_rtsp_mount_points_add_factory(mounts, mount.c_str(), factory);
     // free thing we're no longer using
     g_object_unref(mounts);
     // start rtsp server using info in server obj, ignoring errors
     gst_rtsp_server_attach(server, NULL);
-    std::cout << "Starting loop..." << std::endl;
+    g_print("stream ready at rtsp://127.0.0.1:%s%s\n", port, mount.c_str());
     g_main_loop_run(loop);
+    
     return 0;
 }
