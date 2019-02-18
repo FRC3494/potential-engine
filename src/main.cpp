@@ -86,10 +86,10 @@ int main(int argc, char *argv[]) {
     // set port
     g_object_set(server, "service", std::to_string(port).c_str(), NULL);
 
-    const char* pipeline = rpi_cam_flag ? raspberry_pipe(&video_height, &framerate, &rotation, &preview).c_str() : v4l2_pipe(&video_height, &framerate, &use_hw_encoder).c_str();
+    std::string pipeline = rpi_cam_flag ? raspberry_pipe(&video_height, &framerate, &rotation, &preview) : v4l2_pipe(&video_height, &framerate, &use_hw_encoder);
 
-    g_print("Starting pipline: %s\n", pipeline);
-    gst_rtsp_media_factory_set_launch(factory, pipeline);
+    g_print("Starting pipline: %s\n", pipeline.c_str());
+    gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
     gst_rtsp_media_factory_set_shared(factory, true);
     gst_rtsp_mount_points_add_factory(mounts, mount.c_str(), factory);
     // free thing we're no longer using
