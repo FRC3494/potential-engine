@@ -40,27 +40,21 @@ static GOptionEntry v4l2Entries[] {
     {"use_omx", 'o', 0, G_OPTION_ARG_NONE, &use_hw_encoder, "Use OpenMAX hardware acceleration (default: false)", NULL},
     {NULL}
 };
+GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", NULL, NULL); 
 
 static GOptionEntry rpiCamEntries[] {
     {"preview", 'p', 0, G_OPTION_ARG_NONE, &preview, "Display preview window overlay (default: false)", NULL},
-    {"rotation", 0, 0, G_OPTION_ARG_INT, &rotation, "Video rotation in degrees (default: 0)", NULL},
+    {"rotation", 0, 0, G_OPTION_ARG_INT, &rotation, "Video rotation in degrees (default: 0)", "DEGREES"},
     {NULL}
 };
+GOptionGroup *rpiCOpts = g_option_group_new("rpic", "Raspberry Pi camera module options", "Show Raspberry Pi camera options", NULL, NULL);
 
 int main(int argc, char *argv[]) {
-    GMainLoop *loop;
-    GstRTSPServer *server;
-    GstRTSPMountPoints *mounts;
-    GstRTSPMediaFactory *factory;
+    GMainLoop *loop = g_main_loop_new(NULL, false);
+    GstRTSPServer *server = gst_rtsp_server_new();
+    GstRTSPMountPoints *mounts = gst_rtsp_server_get_mount_points(server);
+    GstRTSPMediaFactory *factory = gst_rtsp_media_factory_new();
     GOptionContext *optctx;
-    // RPI Cam opts
-    GOptionGroup *rpiCOpts;
-    rpiCOpts = g_option_group_new("rpic", "Raspberry Pi camera module options", "Show Raspberry Pi camera options", NULL, NULL);
-    g_option_group_add_entries(rpiCOpts, rpiCamEntries);
-    // group for v4l2-only options
-    GOptionGroup *v4l2Opts; 
-    v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", NULL, NULL);
-    g_option_group_add_entries(v4l2Opts, v4l2Entries);
     GError *error = NULL;
 
     optctx = g_option_context_new(" - Potential Engine RTSP Server\n"
@@ -76,6 +70,8 @@ int main(int argc, char *argv[]) {
     // GST options
     g_option_context_add_group(optctx, gst_init_get_option_group());
     // camera-specific options
+    g_option_group_add_entries(rpiCOpts, rpiCamEntries);
+    g_option_group_add_entries(v4l2Opts, v4l2Entries);
     g_option_context_add_group(optctx, rpiCOpts);
     g_option_context_add_group(optctx, v4l2Opts);
     // parse options passed
@@ -87,23 +83,13 @@ int main(int argc, char *argv[]) {
     }
     g_option_context_free (optctx);
 
-    loop = g_main_loop_new(NULL, false);
-
-    server = gst_rtsp_server_new();
     // set port
     g_object_set(server, "service", std::to_string(port).c_str(), NULL);
-    mounts = gst_rtsp_server_get_mount_points(server);
-    factory = gst_rtsp_media_factory_new();
 
-    std::string pipeline;
-    if (rpi_cam_flag) {
-        pipeline = raspberry_pipe(&video_height, &framerate, &rotation, &preview);
-    } else {
-        pipeline = v4l2_pipe(&video_height, &framerate, &use_hw_encoder);
-    }
+    const char* pipeline = rpi_cam_flag ? raspberry_pipe(&video_height, &framerate, &rotation, &preview).c_str() : v4l2_pipe(&video_height, &framerate, &use_hw_encoder).c_str();
 
-    g_print("Starting pipline: %s\n", pipeline.c_str());
-    gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
+    g_print("Starting pipline: %s\n", pipeline);
+    gst_rtsp_media_factory_set_launch(factory, pipeline);
     gst_rtsp_media_factory_set_shared(factory, true);
     gst_rtsp_mount_points_add_factory(mounts, mount.c_str(), factory);
     // free thing we're no longer using
