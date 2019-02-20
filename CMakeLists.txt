@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-PROJECT(camerac)
+PROJECT(potential-engine)
 
-SET(camerac_SOURCES
+SET(potential-engine_SOURCES
     src/main.cpp
     src/pipe_builder.cpp
     src/optional.cpp    
@@ -14,6 +14,6 @@ PKG_CHECK_MODULES (DEPS REQUIRED fmt gio-2.0 glib-2.0 gstreamer-1.0 gstreamer-rt
 INCLUDE_DIRECTORIES(${DEPS_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DEPS_LIBRARY_DIRS})
 
-ADD_EXECUTABLE(${PROJECT_NAME} ${camerac_SOURCES})
+ADD_EXECUTABLE(${PROJECT_NAME} ${potential-engine_SOURCES})
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${DEPS_LIBRARIES} -lm ${DEPS_LDFLAGS_OTHER})
