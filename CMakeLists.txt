@@ -4,8 +4,9 @@ PROJECT(potential-engine)
 
 SET(potential-engine_SOURCES
     src/main.cpp
-    src/pipe_builder.cpp
+    src/networker.cpp
     src/optional.cpp    
+    src/pipe_builder.cpp
 )
 
 INCLUDE(FindPkgConfig)

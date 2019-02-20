@@ -4,6 +4,7 @@
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
 
+#include "networker.h"
 #include "optional.h"
 #include "pipe_builder.h"
 
@@ -41,6 +42,16 @@ int main(int argc, char *argv[]) {
     }
     g_option_context_free (optctx);
 
+    // shell scope to prevent mem "leak"
+    {
+        const char* addr = address()->c_str();
+        bool b = isValidIP(addr);
+        if (b) {
+            gst_rtsp_server_set_address(server, addr);        
+        } else {
+            g_print("Invalid address %s passed, using 0.0.0.0\n", addr);
+        }
+    }
     // set port
     gst_rtsp_server_set_service(server, std::to_string(*port()).c_str()); 
 
