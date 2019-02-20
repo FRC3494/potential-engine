@@ -4,50 +4,8 @@
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
 
+#include "optional.h"
 #include "pipe_builder.h"
-
-#define STRINGIFY2(X) #X
-#define STRINGIFY(X) STRINGIFY2(X)
-
-#define DEFAULT_RTSP_PORT 8554
-#define DEFAULT_RESOLUTION 480
-#define DEFAULT_FPS 30
-#define DEFAULT_MOUNT "/stream"
-
-static int port = DEFAULT_RTSP_PORT;
-
-static bool rpi_cam_flag = false;
-// Raspberry-specific options
-static int rotation = 0;
-static bool preview = false;
-// V4L2 options
-static bool use_hw_encoder = false;
-// common options
-static int video_height = DEFAULT_RESOLUTION;
-static int framerate = DEFAULT_FPS;
-static std::string mount = (char *) DEFAULT_MOUNT;
-
-static GOptionEntry entries[] = {
-    {"rpi_cam", 'r', 0, G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
-    {"fps", 'f', 0, G_OPTION_ARG_INT, &framerate, "Framerate in FPS (default: " STRINGIFY(DEFAULT_FPS) ")", "FPS"},
-    {"height", 'h', 0, G_OPTION_ARG_INT, &video_height, "Video height. Should be a standard resolution (in [240, 360, 480, 720] for most cameras.)", "HEIGHT"},
-    {"url", 'u', 0, G_OPTION_ARG_STRING, &mount, "URL to stream video at. Must start with \"/\" (default: " DEFAULT_MOUNT ")", "URL"},
-    {"port", 'p', 0, G_OPTION_ARG_INT, &port, "Port to listen on (default: " STRINGIFY(DEFAULT_RTSP_PORT) ")", "PORT"},
-    {NULL}
-};
-
-static GOptionEntry v4l2Entries[] {
-    {"use_omx", 'o', 0, G_OPTION_ARG_NONE, &use_hw_encoder, "Use OpenMAX hardware acceleration (default: false)", NULL},
-    {NULL}
-};
-GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", NULL, NULL); 
-
-static GOptionEntry rpiCamEntries[] {
-    {"preview", 'p', 0, G_OPTION_ARG_NONE, &preview, "Display preview window overlay (default: false)", NULL},
-    {"rotation", 0, 0, G_OPTION_ARG_INT, &rotation, "Video rotation in degrees (default: 0)", "DEGREES"},
-    {NULL}
-};
-GOptionGroup *rpiCOpts = g_option_group_new("rpic", "Raspberry Pi camera module options", "Show Raspberry Pi camera options", NULL, NULL);
 
 int main(int argc, char *argv[]) {
     GMainLoop *loop = g_main_loop_new(NULL, false);
@@ -66,14 +24,14 @@ int main(int argc, char *argv[]) {
                 "under certain conditions; see LICENSE for details."
     );
     // Add common options
-    g_option_context_add_main_entries(optctx, entries, NULL);
+    g_option_context_add_main_entries(optctx, get_main_opts(), NULL);
     // GST options
     g_option_context_add_group(optctx, gst_init_get_option_group());
-    // camera-specific options
-    g_option_group_add_entries(rpiCOpts, rpiCamEntries);
-    g_option_group_add_entries(v4l2Opts, v4l2Entries);
-    g_option_context_add_group(optctx, rpiCOpts);
-    g_option_context_add_group(optctx, v4l2Opts);
+    // setup options
+    init_options();
+    g_option_context_add_group(optctx, get_rpi_opts());
+    g_option_context_add_group(optctx, get_v4l2_opts());
+    g_option_context_add_group(optctx, get_net_opts());
     // parse options passed
     if (!g_option_context_parse (optctx, &argc, &argv, &error)) {
         g_printerr ("Error parsing options: %s\n", error->message);
@@ -84,19 +42,21 @@ int main(int argc, char *argv[]) {
     g_option_context_free (optctx);
 
     // set port
-    g_object_set(server, "service", std::to_string(port).c_str(), NULL);
+    gst_rtsp_server_set_service(server, std::to_string(*port()).c_str()); 
 
-    std::string pipeline = rpi_cam_flag ? raspberry_pipe(&video_height, &framerate, &rotation, &preview) : v4l2_pipe(&video_height, &framerate, &use_hw_encoder);
+    std::string pipeline = use_rpi_cam() ? raspberry_pipe(video_height(), framerate(), rotation(), preview()) : v4l2_pipe(video_height(), framerate(), use_hw_encoder());
 
     g_print("Starting pipline: %s\n", pipeline.c_str());
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
     gst_rtsp_media_factory_set_shared(factory, true);
-    gst_rtsp_mount_points_add_factory(mounts, mount.c_str(), factory);
+    gst_rtsp_mount_points_add_factory(mounts, (*mount()).c_str(), factory);
     // free thing we're no longer using
     g_object_unref(mounts);
     // start rtsp server, ignoring errors
     gst_rtsp_server_attach(server, NULL);
-    g_print("stream ready at rtsp://127.0.0.1:%s%s\n", std::to_string(port).c_str(), mount.c_str());
+    gchar* addr = gst_rtsp_server_get_address(server);
+    g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), (*mount()).c_str());
+    g_free(addr);
     g_main_loop_run(loop);
     
     return 0;
