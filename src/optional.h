@@ -1,4 +1,3 @@
-#include <string>
 #include <glib.h>
 
 bool use_rpi_cam();
@@ -11,9 +10,9 @@ bool* use_hw_encoder();
 int* video_height();
 int* framerate();
 
-std::string* address();
+char* address();
 int* port();
-std::string* mount();
+char* mount();
 
 void init_options();
 

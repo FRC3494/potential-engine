@@ -18,9 +18,9 @@ bool hw_encoder = false;
 int height = DEFAULT_RESOLUTION;
 int fps = DEFAULT_FPS;
 // network
-std::string addr = "0.0.0.0";
+char* addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
-std::string url = (char *) DEFAULT_MOUNT;
+char* url = (char *) DEFAULT_MOUNT;
 
 GOptionEntry entries[] = {
     {"rpi_cam", 'r', 0, G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
@@ -66,9 +66,9 @@ bool *use_hw_encoder() { return &hw_encoder; }
 int *video_height() { return &height; }
 int *framerate() { return &fps; }
 
-std::string *address() { return &addr; }
+char* address() { return addr; }
 int *port() { return &port_; }
-std::string *mount() { return &url; }
+char* mount() { return url; }
 
 GOptionEntry* get_main_opts() {
     return entries;

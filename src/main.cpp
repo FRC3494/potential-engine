@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     // shell scope to prevent mem "leak"
     {
-        const char* addr = address()->c_str();
+        const char* addr = address();
         bool b = isValidIP(addr);
         if (b) {
             gst_rtsp_server_set_address(server, addr);        
@@ -60,13 +60,13 @@ int main(int argc, char *argv[]) {
     g_print("Starting pipline: %s\n", pipeline.c_str());
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
     gst_rtsp_media_factory_set_shared(factory, true);
-    gst_rtsp_mount_points_add_factory(mounts, (*mount()).c_str(), factory);
+    gst_rtsp_mount_points_add_factory(mounts, mount(), factory);
     // free thing we're no longer using
     g_object_unref(mounts);
     // start rtsp server, ignoring errors
     gst_rtsp_server_attach(server, NULL);
     gchar* addr = gst_rtsp_server_get_address(server);
-    g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), (*mount()).c_str());
+    g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), mount());
     g_free(addr);
     g_main_loop_run(loop);
     
