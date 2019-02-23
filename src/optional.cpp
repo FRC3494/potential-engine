@@ -12,6 +12,7 @@
 #define DEFAULT_MOUNT "/stream"
 
 bool rpi_cam_flag = false;
+bool judge = false;
 // Raspberry-specific options
 int rot = 0;
 bool prev = false;
@@ -24,23 +25,16 @@ int fps = DEFAULT_FPS;
 char* addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
 char url[] = DEFAULT_MOUNT;
+static gboolean validateMount(const char* option_name, const char* value, gpointer data, GError **error);
 
 GOptionEntry entries[] = {
     {"rpi_cam", 'r', 0, G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
     {"fps", 'f', 0, G_OPTION_ARG_INT, &fps, "Framerate in FPS (default: " STRINGIFY(DEFAULT_FPS) ")", "FPS"},
     {"height", 'h', 0, G_OPTION_ARG_INT, &height, "Video height. Should be a standard resolution (in [240, 360, 480, 720] for most cameras.)", "HEIGHT"},
+    {"judge", '9', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, &judge, "", NULL},
     {NULL}
 };
 
-gboolean validateMount(const char* option_name, const char* value, gpointer data, GError **error) {
-    std::string betterValue(value);
-    bool ret = (betterValue[0] == '/');
-    if (!ret) {
-        betterValue.insert(0, 1, '/');
-    }
-    strcpy(url, betterValue.c_str());
-    return true;
-}
 static GOptionEntry netEntries[] {
     {"address", 'a', 0, G_OPTION_ARG_STRING, &addr, "Network address to bind to (default: 0.0.0.0)", "ADDRESS"},
     {"port", 'p', 0, G_OPTION_ARG_INT, &port_, "Port to listen on (default: " STRINGIFY(DEFAULT_RTSP_PORT) ")", "PORT"},
@@ -68,6 +62,17 @@ void init_options() {
     g_option_group_add_entries(netOpts, netEntries);
 }
 
+static gboolean validateMount(const char* option_name, const char* value, gpointer data, GError **error) {
+    std::string betterValue(value);
+    bool ret = (betterValue[0] == '/');
+    if (!ret) {
+        betterValue.insert(0, 1, '/');
+    }
+    strcpy(url, betterValue.c_str());
+    return true;
+}
+
+
 bool use_rpi_cam() { return rpi_cam_flag; }
 
 int *rotation() { return &rot; }
@@ -78,7 +83,7 @@ bool *use_hw_encoder() { return &hw_encoder; }
 int *video_height() { return &height; }
 int *framerate() { return &fps; }
 
-char* address() { return addr; }
+const char* address() { return addr; }
 int *port() { return &port_; }
 const char* mount() { return url; }
 
@@ -97,3 +102,6 @@ GOptionGroup* get_v4l2_opts() {
 GOptionGroup* get_net_opts() {
     return netOpts;
 }
+
+bool judgemental() { return judge; }
+

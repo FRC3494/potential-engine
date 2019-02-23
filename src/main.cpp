@@ -67,6 +67,19 @@ int main(int argc, char *argv[]) {
     gst_rtsp_server_attach(server, NULL);
     gchar* addr = gst_rtsp_server_get_address(server);
     g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), mount());
+    {
+        bool b = judgemental();
+        if (b) {
+            g_print("        /\\\n"
+                    " |9|   /==\\\n"
+                    "  |    \\==/\n"
+                    " (==)- /\\/\n"
+                    "  ||--/ *ping*\n"
+                    "  ||\n"
+                    "  /\\\n"
+                    "_/  \\_\n");
+        }
+    }
     g_free(addr);
     g_main_loop_run(loop);
     
