@@ -12,7 +12,7 @@ int* framerate();
 
 char* address();
 int* port();
-char* mount();
+const char* mount();
 
 void init_options();
 

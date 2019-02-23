@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string>
+
 #include "optional.h"
 
 #define STRINGIFY2(X) #X
@@ -20,7 +23,7 @@ int fps = DEFAULT_FPS;
 // network
 char* addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
-char* url = (char *) DEFAULT_MOUNT;
+char url[] = DEFAULT_MOUNT;
 
 GOptionEntry entries[] = {
     {"rpi_cam", 'r', 0, G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
@@ -29,10 +32,19 @@ GOptionEntry entries[] = {
     {NULL}
 };
 
+gboolean validateMount(const char* option_name, const char* value, gpointer data, GError **error) {
+    std::string betterValue(value);
+    bool ret = (betterValue[0] == '/');
+    if (!ret) {
+        betterValue.insert(0, 1, '/');
+    }
+    strcpy(url, betterValue.c_str());
+    return true;
+}
 static GOptionEntry netEntries[] {
     {"address", 'a', 0, G_OPTION_ARG_STRING, &addr, "Network address to bind to (default: 0.0.0.0)", "ADDRESS"},
     {"port", 'p', 0, G_OPTION_ARG_INT, &port_, "Port to listen on (default: " STRINGIFY(DEFAULT_RTSP_PORT) ")", "PORT"},
-    {"url", 'u', 0, G_OPTION_ARG_STRING, &url, "URL to stream video at. Must start with \"/\" (default: " DEFAULT_MOUNT ")", "URL"},
+    {"url", 'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, (gpointer) validateMount, "URL to stream video at. Must start with \"/\" (default: " DEFAULT_MOUNT ")", "URL"},
     {NULL}
 };
 GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", NULL, NULL);
@@ -68,7 +80,7 @@ int *framerate() { return &fps; }
 
 char* address() { return addr; }
 int *port() { return &port_; }
-char* mount() { return url; }
+const char* mount() { return url; }
 
 GOptionEntry* get_main_opts() {
     return entries;
