@@ -24,7 +24,7 @@ int fps = DEFAULT_FPS;
 // network
 char* addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
-char url[] = DEFAULT_MOUNT;
+std::string url = DEFAULT_MOUNT;
 static gboolean validateMount(const char* option_name, const char* value, gpointer data, GError **error);
 
 GOptionEntry entries[] = {
@@ -68,7 +68,8 @@ static gboolean validateMount(const char* option_name, const char* value, gpoint
     if (!ret) {
         betterValue.insert(0, 1, '/');
     }
-    strcpy(url, betterValue.c_str());
+    // strcpy(url, betterValue.c_str());
+    url = betterValue;
     return true;
 }
 
@@ -85,7 +86,7 @@ int *framerate() { return &fps; }
 
 const char* address() { return addr; }
 int *port() { return &port_; }
-const char* mount() { return url; }
+const char* mount() { return url.c_str(); }
 
 GOptionEntry* get_main_opts() {
     return entries;
