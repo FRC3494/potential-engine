@@ -38,7 +38,7 @@ GOptionEntry entries[] = {
 static GOptionEntry netEntries[] {
     {"address", 'a', 0, G_OPTION_ARG_STRING, &addr, "Network address to bind to (default: 0.0.0.0)", "ADDRESS"},
     {"port", 'p', 0, G_OPTION_ARG_INT, &port_, "Port to listen on (default: " STRINGIFY(DEFAULT_RTSP_PORT) ")", "PORT"},
-    {"url", 'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, (gpointer) validateMount, "URL to stream video at. Must start with \"/\" (default: " DEFAULT_MOUNT ")", "URL"},
+    {"url", 'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, (gpointer) validateMount, "URL to stream video at (default: " DEFAULT_MOUNT ")", "URL"},
     {NULL}
 };
 GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", NULL, NULL);
