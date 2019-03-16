@@ -24,8 +24,8 @@ int fps = DEFAULT_FPS;
 // network
 char* addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
-std::string url = DEFAULT_MOUNT;
-static gboolean validateMount(const char* option_name, const char* value, gpointer data, GError **error);
+// std::string url = DEFAULT_MOUNT;
+const char* url = NULL;
 
 GOptionEntry entries[] = {
     {"rpi_cam", 'r', 0, G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
@@ -38,7 +38,7 @@ GOptionEntry entries[] = {
 static GOptionEntry netEntries[] {
     {"address", 'a', 0, G_OPTION_ARG_STRING, &addr, "Network address to bind to (default: 0.0.0.0)", "ADDRESS"},
     {"port", 'p', 0, G_OPTION_ARG_INT, &port_, "Port to listen on (default: " STRINGIFY(DEFAULT_RTSP_PORT) ")", "PORT"},
-    {"url", 'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_CALLBACK, (gpointer) validateMount, "URL to stream video at (default: " DEFAULT_MOUNT ")", "URL"},
+    {"url", 'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &url, "URL to stream video at (default: " DEFAULT_MOUNT ")", "URL"},
     {NULL}
 };
 GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", NULL, NULL);
@@ -57,36 +57,36 @@ static GOptionEntry rpiCamEntries[] {
 GOptionGroup *rpiCOpts = g_option_group_new("rpic", "Raspberry Pi camera module options", "Show Raspberry Pi camera options", NULL, NULL);
 
 void init_options() {
+    g_option_group_add_entries(netOpts, netEntries);
     g_option_group_add_entries(rpiCOpts, rpiCamEntries);
     g_option_group_add_entries(v4l2Opts, v4l2Entries);
-    g_option_group_add_entries(netOpts, netEntries);
 }
-
-static gboolean validateMount(const char* option_name, const char* value, gpointer data, GError **error) {
-    std::string betterValue(value);
-    bool ret = (betterValue[0] == '/');
-    if (!ret) {
-        betterValue.insert(0, 1, '/');
-    }
-    // strcpy(url, betterValue.c_str());
-    url = betterValue;
-    return true;
-}
-
 
 bool use_rpi_cam() { return rpi_cam_flag; }
 
 int *rotation() { return &rot; }
 bool *preview() { return &prev; }
 
-bool *use_hw_encoder() { return &hw_encoder; }
+bool use_hw_encoder() { return hw_encoder; }
 
 int *video_height() { return &height; }
 int *framerate() { return &fps; }
 
 const char* address() { return addr; }
 int *port() { return &port_; }
-const char* mount() { return url.c_str(); }
+std::string mount() {
+    if (url != NULL) {
+        std::string ret = std::string(url);
+        if (ret[0] == '/') {
+            return ret;
+        } else {
+            ret.insert(0, 1, '/');
+            return ret;
+        }
+    } else {
+        return std::string(DEFAULT_MOUNT);
+    }
+}
 
 GOptionEntry* get_main_opts() {
     return entries;
@@ -105,4 +105,3 @@ GOptionGroup* get_net_opts() {
 }
 
 bool judgemental() { return judge; }
-
