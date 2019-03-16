@@ -22,7 +22,12 @@ std::string raspberry_pipe(const int* height, const int* framerate, const int* r
 }
 
 std::string v4l2_pipe(const int* height, const int* framerate, const bool openmax) {
-    std::string encoder = (openmax) ? "omxh264enc ! video/x-h264,profile=baseline" : "x264enc tune=zerolatency";
+    std::string encoder;
+    if (openmax) {
+        encoder = "omxh264enc ! video/x-h264,profile=baseline"; 
+    } else {
+       encoder = "x264enc tune=zerolatency"; 
+    }
     return fmt::format("v4l2src ! "
         "video/x-raw,format=YUY2,height={h},framerate={f}/1 ! "
         "videoconvert ! "
