@@ -56,13 +56,12 @@ int main(int argc, char *argv[]) {
     gst_rtsp_server_set_service(server, std::to_string(*port()).c_str());
 
     std::string pipeline;
-    {
-        gboolean rpi = use_rpi_cam();
-        if (rpi) {
-            pipeline = raspberry_pipe(video_height(), framerate(), rotation(), preview());
-        } else {
-            v4l2_pipe(video_height(), framerate(), use_hw_encoder());
-        }
+
+    gboolean rpi = use_rpi_cam();
+    if (rpi) {
+        pipeline = raspberry_pipe(video_height(), framerate(), rotation(), preview());
+    } else {
+        v4l2_pipe(video_height(), framerate(), use_hw_encoder());
     }
 
     g_print("Starting pipline: %s\n", pipeline.c_str());
