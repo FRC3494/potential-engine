@@ -67,13 +67,15 @@ int main(int argc, char *argv[]) {
     g_print("Starting pipline: %s\n", pipeline.c_str());
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
     gst_rtsp_media_factory_set_shared(factory, true);
-    gst_rtsp_mount_points_add_factory(mounts, mount(), factory);
+    const char* m = mount();
+    g_print("Mounting to %s\n", m);
+    gst_rtsp_mount_points_add_factory(mounts, m, factory);
     // free thing we're no longer using
     g_object_unref(mounts);
     // start rtsp server, ignoring errors
     gst_rtsp_server_attach(server, NULL);
     gchar* addr = gst_rtsp_server_get_address(server);
-    g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), mount());
+    g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), m);
     {
         bool b = judgemental();
         if (b) {
