@@ -1,4 +1,5 @@
 #include <glib.h>
+#include <string>
 
 bool use_rpi_cam();
 
@@ -12,7 +13,7 @@ int* framerate();
 
 const char* address();
 int* port();
-const char* mount();
+std::string mount();
 
 void init_options();
 

@@ -86,7 +86,7 @@ int *framerate() { return &fps; }
 
 const char* address() { return addr; }
 int *port() { return &port_; }
-const char* mount() { return url.c_str(); }
+std::string mount() { return url; }
 
 GOptionEntry* get_main_opts() {
     return entries;
@@ -105,4 +105,3 @@ GOptionGroup* get_net_opts() {
 }
 
 bool judgemental() { return judge; }
-
