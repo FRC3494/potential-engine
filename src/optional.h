@@ -5,7 +5,7 @@ bool use_rpi_cam();
 int* rotation();
 bool* preview();
 
-bool* use_hw_encoder();
+bool use_hw_encoder();
 
 int* video_height();
 int* framerate();

@@ -79,7 +79,7 @@ bool use_rpi_cam() { return rpi_cam_flag; }
 int *rotation() { return &rot; }
 bool *preview() { return &prev; }
 
-bool *use_hw_encoder() { return &hw_encoder; }
+bool use_hw_encoder() { return hw_encoder; }
 
 int *video_height() { return &height; }
 int *framerate() { return &fps; }

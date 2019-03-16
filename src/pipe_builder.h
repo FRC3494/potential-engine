@@ -7,5 +7,5 @@ std::string raspberry_pipe(const int* height,
 );
 std::string v4l2_pipe(const int* height,
     const int* framerate,
-    const bool* openmax
+    const bool openmax
 );
