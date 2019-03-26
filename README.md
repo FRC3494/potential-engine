@@ -22,7 +22,7 @@ A pretty simple RTSP (**R**eal **T**ime **S**treaming **P**rotocol) server.
 
 On Raspbian, you can install everything you need to build and run this repository **except `fmt`** with the following mouthful of a command:
 ```bash
-sudo apt update && sudo apt upgrade && sudo apt install git cmake pkg-config gstreamer1.0-omx-rpi gstreamer1.0-omx libgstreamer-1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-rtsp
+sudo apt update && sudo apt upgrade && sudo apt install git cmake pkg-config gstreamer1.0-omx-rpi gstreamer1.0-omx libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-rtsp
 ```
 If you need to install `fmt` from source, run the following:
 ```bash
