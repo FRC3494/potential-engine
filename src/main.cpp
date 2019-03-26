@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
         pipeline = v4l2_pipe(video_height(), framerate(), use_hw_encoder(), v4l2_device());
     }
 
-    g_print("Starting pipline: %s\n", pipeline.c_str());
+    g_print("Starting pipeline: %s\n", pipeline.c_str());
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
     gst_rtsp_media_factory_set_shared(factory, true);
     std::string m = mount();
@@ -75,6 +75,16 @@ int main(int argc, char *argv[]) {
     // start rtsp server, ignoring errors
     gst_rtsp_server_attach(server, nullptr);
     gchar *addr = gst_rtsp_server_get_address(server);
+    {
+        int p = gst_rtsp_server_get_bound_port(server);
+        if (p == -1) {
+            int goal_port = *port();
+            g_printerr(
+                    "Port %d did not bind properly. Check that this machine owns the IPv4 address %s and that %d is not bound.\n",
+                    goal_port, addr, goal_port);
+            exit(EADDRNOTAVAIL);
+        }
+    }
     g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), mount_cstr);
     {
         bool b = judgemental();
