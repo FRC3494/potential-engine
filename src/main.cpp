@@ -8,12 +8,12 @@
 #include "pipe_builder.h"
 
 int main(int argc, char *argv[]) {
-    GMainLoop *loop = g_main_loop_new(NULL, false);
+    GMainLoop *loop = g_main_loop_new(nullptr, false);
     GstRTSPServer *server = gst_rtsp_server_new();
     GstRTSPMountPoints *mounts = gst_rtsp_server_get_mount_points(server);
     GstRTSPMediaFactory *factory = gst_rtsp_media_factory_new();
     GOptionContext *optctx;
-    GError *error = NULL;
+    GError *error = nullptr;
 
     optctx = g_option_context_new(" - Potential Engine RTSP Server\n"
                                   "\n"
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
                                   "under certain conditions; see LICENSE for details."
     );
     // Add common options
-    g_option_context_add_main_entries(optctx, get_main_opts(), NULL);
+    g_option_context_add_main_entries(optctx, get_main_opts(), nullptr);
     // GST options
     g_option_context_add_group(optctx, gst_init_get_option_group());
     // setup options
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     // free thing we're no longer using
     g_object_unref(mounts);
     // start rtsp server, ignoring errors
-    gst_rtsp_server_attach(server, NULL);
+    gst_rtsp_server_attach(server, nullptr);
     gchar *addr = gst_rtsp_server_get_address(server);
     g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), mount_cstr);
     {

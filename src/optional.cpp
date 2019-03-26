@@ -25,16 +25,15 @@ int fps = DEFAULT_FPS;
 // network
 char *addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
-// std::string url = DEFAULT_MOUNT;
-const char *url = NULL;
+const char *url = nullptr;
 
 GOptionEntry entries[] = {
-        {"rpi_cam", 'r', G_OPTION_FLAG_NONE,   G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
+        {"rpi_cam", 'r', G_OPTION_FLAG_NONE,   G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)",                                           nullptr},
         {"fps",     'f', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &fps,          "Framerate in FPS (default: " STRINGIFY(
                 DEFAULT_FPS) ")",                                                                                                                                             "FPS"},
         {"height",  'h', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &height,       "Video height. Should be a standard resolution (in [240, 360, 480, 720] for most cameras.)", "HEIGHT"},
-        {"judge",   '9', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, &judge,        "",                                                NULL},
-        {NULL}
+        {"judge",   '9', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, &judge,        "",                                                                                          nullptr},
+        {nullptr}
 };
 
 static GOptionEntry netEntries[]{
@@ -42,24 +41,25 @@ static GOptionEntry netEntries[]{
         {"port",    'p', G_OPTION_FLAG_NONE, G_OPTION_ARG_INT,    &port_, "Port to listen on (default: " STRINGIFY(
                 DEFAULT_RTSP_PORT) ")",                                                                                          "PORT"},
         {"url",     'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &url,   "URL to stream video at (default: " DEFAULT_MOUNT ")", "URL"},
-        {NULL}
+        {nullptr}
 };
-GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", NULL, NULL);
+GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", nullptr, nullptr);
 
 static GOptionEntry v4l2Entries[]{
-        {"use_omx", 'o', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &hw_encoder, "Use OpenMAX hardware acceleration (default: false)", NULL},
-        {"device",  'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_dev,   "Video4Linux2 device to use (default: /dev/video0)", "DEVICE"},
-        {NULL}
+        {"use_omx", 'o', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &hw_encoder, "Use OpenMAX hardware acceleration (default: false)", nullptr},
+        {"device",  'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_dev,   "Video4Linux2 device to use (default: /dev/video0)",  "DEVICE"},
+        {nullptr}
 };
-GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", NULL, NULL);
+GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", nullptr,
+                                            nullptr);
 
 static GOptionEntry rpiCamEntries[]{
-        {"preview",  'p', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &prev, "Display preview window overlay (default: false)", NULL},
-        {"rotation", 0,   G_OPTION_FLAG_NONE, G_OPTION_ARG_INT,  &rot,  "Video rotation in degrees (default: 0)", "DEGREES"},
-        {NULL}
+        {"preview",  'p', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &prev, "Display preview window overlay (default: false)", nullptr},
+        {"rotation", 0,   G_OPTION_FLAG_NONE, G_OPTION_ARG_INT,  &rot,  "Video rotation in degrees (default: 0)",          "DEGREES"},
+        {nullptr}
 };
 GOptionGroup *rpiCOpts = g_option_group_new("rpic", "Raspberry Pi camera module options",
-                                            "Show Raspberry Pi camera options", NULL, NULL);
+                                            "Show Raspberry Pi camera options", nullptr, nullptr);
 
 void init_options() {
     g_option_group_add_entries(netOpts, netEntries);
@@ -86,7 +86,7 @@ const char *address() { return addr; }
 int *port() { return &port_; }
 
 std::string mount() {
-    if (url != NULL) {
+    if (url != nullptr) {
         std::string ret = std::string(url);
         if (ret[0] == '/') {
             return ret;
