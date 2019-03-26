@@ -47,8 +47,8 @@ static GOptionEntry netEntries[]{
 GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", NULL, NULL);
 
 static GOptionEntry v4l2Entries[]{
-        {"use_omx", 'o', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &hw_encoder,  "Use OpenMAX hardware acceleration (default: false)", NULL},
-        {"device",  'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_dev, "Video4Linux2 device to use (default: /dev/video0)", "DEVICE"},
+        {"use_omx", 'o', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &hw_encoder, "Use OpenMAX hardware acceleration (default: false)", NULL},
+        {"device",  'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_dev,   "Video4Linux2 device to use (default: /dev/video0)", "DEVICE"},
         {NULL}
 };
 GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", NULL, NULL);
