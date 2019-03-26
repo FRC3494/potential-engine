@@ -18,45 +18,48 @@ int rot = 0;
 bool prev = false;
 // V4L2 options
 bool hw_encoder = false;
-char* v4l2_device = "/dev/video0";
+char *v4l2_device = "/dev/video0";
 // common options
 int height = DEFAULT_RESOLUTION;
 int fps = DEFAULT_FPS;
 // network
-char* addr = (char *) "0.0.0.0";
+char *addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
 // std::string url = DEFAULT_MOUNT;
-const char* url = NULL;
+const char *url = NULL;
 
 GOptionEntry entries[] = {
-    {"rpi_cam", 'r', 0, G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
-    {"fps", 'f', 0, G_OPTION_ARG_INT, &fps, "Framerate in FPS (default: " STRINGIFY(DEFAULT_FPS) ")", "FPS"},
-    {"height", 'h', 0, G_OPTION_ARG_INT, &height, "Video height. Should be a standard resolution (in [240, 360, 480, 720] for most cameras.)", "HEIGHT"},
-    {"judge", '9', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, &judge, "", NULL},
-    {NULL}
+        {"rpi_cam", 'r', G_OPTION_FLAG_NONE,   G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)", NULL},
+        {"fps",     'f', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &fps,          "Framerate in FPS (default: " STRINGIFY(
+                DEFAULT_FPS) ")",                                                                                                                                             "FPS"},
+        {"height",  'h', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &height,       "Video height. Should be a standard resolution (in [240, 360, 480, 720] for most cameras.)", "HEIGHT"},
+        {"judge",   '9', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, &judge,        "",                                                NULL},
+        {NULL}
 };
 
-static GOptionEntry netEntries[] {
-    {"address", 'a', 0, G_OPTION_ARG_STRING, &addr, "Network address to bind to (default: 0.0.0.0)", "ADDRESS"},
-    {"port", 'p', 0, G_OPTION_ARG_INT, &port_, "Port to listen on (default: " STRINGIFY(DEFAULT_RTSP_PORT) ")", "PORT"},
-    {"url", 'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &url, "URL to stream video at (default: " DEFAULT_MOUNT ")", "URL"},
-    {NULL}
+static GOptionEntry netEntries[]{
+        {"address", 'a', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &addr,  "Network address to bind to (default: 0.0.0.0)",       "ADDRESS"},
+        {"port",    'p', G_OPTION_FLAG_NONE, G_OPTION_ARG_INT,    &port_, "Port to listen on (default: " STRINGIFY(
+                DEFAULT_RTSP_PORT) ")",                                                                                          "PORT"},
+        {"url",     'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &url,   "URL to stream video at (default: " DEFAULT_MOUNT ")", "URL"},
+        {NULL}
 };
 GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", NULL, NULL);
 
-static GOptionEntry v4l2Entries[] {
-    {"use_omx", 'o', 0, G_OPTION_ARG_NONE, &hw_encoder, "Use OpenMAX hardware acceleration (default: false)", NULL},
-    {"device", 'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_device, "Video4Linux2 device to use (default: /dev/video0)", "DEVICE"},
-    {NULL}
+static GOptionEntry v4l2Entries[]{
+        {"use_omx", 'o', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &hw_encoder,  "Use OpenMAX hardware acceleration (default: false)", NULL},
+        {"device",  'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_device, "Video4Linux2 device to use (default: /dev/video0)", "DEVICE"},
+        {NULL}
 };
-GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", NULL, NULL); 
+GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", NULL, NULL);
 
-static GOptionEntry rpiCamEntries[] {
-    {"preview", 'p', 0, G_OPTION_ARG_NONE, &prev, "Display preview window overlay (default: false)", NULL},
-    {"rotation", 0, 0, G_OPTION_ARG_INT, &rot, "Video rotation in degrees (default: 0)", "DEGREES"},
-    {NULL}
+static GOptionEntry rpiCamEntries[]{
+        {"preview",  'p', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &prev, "Display preview window overlay (default: false)", NULL},
+        {"rotation", 0,   G_OPTION_FLAG_NONE, G_OPTION_ARG_INT,  &rot,  "Video rotation in degrees (default: 0)", "DEGREES"},
+        {NULL}
 };
-GOptionGroup *rpiCOpts = g_option_group_new("rpic", "Raspberry Pi camera module options", "Show Raspberry Pi camera options", NULL, NULL);
+GOptionGroup *rpiCOpts = g_option_group_new("rpic", "Raspberry Pi camera module options",
+                                            "Show Raspberry Pi camera options", NULL, NULL);
 
 void init_options() {
     g_option_group_add_entries(netOpts, netEntries);
@@ -67,15 +70,19 @@ void init_options() {
 bool use_rpi_cam() { return rpi_cam_flag; }
 
 int *rotation() { return &rot; }
+
 bool *preview() { return &prev; }
 
 bool use_hw_encoder() { return hw_encoder; }
 
 int *video_height() { return &height; }
+
 int *framerate() { return &fps; }
 
-const char* address() { return addr; }
+const char *address() { return addr; }
+
 int *port() { return &port_; }
+
 std::string mount() {
     if (url != NULL) {
         std::string ret = std::string(url);
@@ -90,19 +97,19 @@ std::string mount() {
     }
 }
 
-GOptionEntry* get_main_opts() {
+GOptionEntry *get_main_opts() {
     return entries;
 }
 
-GOptionGroup* get_rpi_opts() {
+GOptionGroup *get_rpi_opts() {
     return rpiCOpts;
 }
 
-GOptionGroup* get_v4l2_opts() {
+GOptionGroup *get_v4l2_opts() {
     return v4l2Opts;
 }
 
-GOptionGroup* get_net_opts() {
+GOptionGroup *get_net_opts() {
     return netOpts;
 }
 
