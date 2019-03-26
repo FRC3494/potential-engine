@@ -22,9 +22,9 @@ std::string raspberry_pipe(const int *height, const int *framerate, const int *r
     return pipeline;
 }
 
-std::string v4l2_pipe(const int *height, const int *framerate, const bool openmax, std::string device) {
+std::string v4l2_pipe(const int *height, const int *framerate, const bool *openmax, std::string device) {
     std::string encoder;
-    if (openmax) {
+    if (*openmax) {
         encoder = "omxh264enc ! video/x-h264,profile=baseline";
     } else {
         encoder = "x264enc tune=zerolatency";

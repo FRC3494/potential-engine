@@ -73,7 +73,7 @@ int *rotation() { return &rot; }
 
 bool *preview() { return &prev; }
 
-bool use_hw_encoder() { return hw_encoder; }
+bool *use_hw_encoder() { return &hw_encoder; }
 
 std::string v4l2_device() { return std::string(v4l2_dev); }
 

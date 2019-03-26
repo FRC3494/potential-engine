@@ -7,7 +7,7 @@ int *rotation();
 
 bool *preview();
 
-bool use_hw_encoder();
+bool *use_hw_encoder();
 
 std::string v4l2_device();
 
