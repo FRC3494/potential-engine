@@ -1,5 +1,4 @@
 #include <map>
-#include <string>
 #include <fmt/core.h>
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
@@ -47,7 +46,7 @@ int main(int argc, char *argv[]) {
         const char* addr = address();
         bool b = isValidIP(addr);
         if (b) {
-            gst_rtsp_server_set_address(server, addr); 
+            gst_rtsp_server_set_address(server, addr);
         } else {
             g_print("Invalid address %s passed, using 0.0.0.0\n", addr);
         }
@@ -61,7 +60,7 @@ int main(int argc, char *argv[]) {
     if (rpi) {
         pipeline = raspberry_pipe(video_height(), framerate(), rotation(), preview());
     } else {
-        pipeline = v4l2_pipe(video_height(), framerate(), use_hw_encoder());
+        pipeline = v4l2_pipe(video_height(), framerate(), use_hw_encoder(), v4l2_device());
     }
 
     g_print("Starting pipline: %s\n", pipeline.c_str());
