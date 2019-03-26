@@ -18,7 +18,7 @@ int rot = 0;
 bool prev = false;
 // V4L2 options
 bool hw_encoder = false;
-char *v4l2_device = "/dev/video0";
+char *v4l2_device = (char *) "/dev/video0";
 // common options
 int height = DEFAULT_RESOLUTION;
 int fps = DEFAULT_FPS;
