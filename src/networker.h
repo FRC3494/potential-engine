@@ -1,4 +1,4 @@
 #include <string>
 #include <arpa/inet.h>
 
-bool isValidIP(const char* address);
+bool isValidIP(const char *address);
