@@ -1,8 +1,11 @@
 #include <string>
 
+#ifndef V4ENCS
+#define V4ENCS
 enum class V4L2Encoders {
     CAMERA_H264, OPENMAX, SOFTWARE
 };
+#endif
 
 std::string raspberry_pipe(const int *height,
                            const int *framerate,
