@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     if (rpi) {
         pipeline = raspberry_pipe(video_height(), framerate(), rotation(), preview());
     } else {
-        pipeline = v4l2_pipe(video_height(), framerate(), use_hw_encoder(), v4l2_device());
+        pipeline = v4l2_pipe(video_height(), framerate(), selected_encoder(), v4l2_device());
     }
 
     g_print("Starting pipeline: %s\n", pipeline.c_str());

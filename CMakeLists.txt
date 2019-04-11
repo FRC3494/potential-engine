@@ -1,25 +1,20 @@
 cmake_minimum_required(VERSION 3.1)
-set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
 
 PROJECT(potential-engine)
 
-SET(potential-engine_SOURCES
-    src/main.cpp
-    src/networker.cpp
-    src/optional.cpp    
-    src/pipe_builder.cpp
-)
+AUX_SOURCE_DIRECTORY(src potential-engine_SOURCES)
 
 INCLUDE(FindPkgConfig)
 
-PKG_CHECK_MODULES (DEPS REQUIRED fmt gio-2.0 glib-2.0 gstreamer-1.0 gstreamer-rtsp-server-1.0)
+PKG_CHECK_MODULES(DEPS REQUIRED fmt gio-2.0 glib-2.0 gstreamer-1.0 gstreamer-rtsp-server-1.0)
 INCLUDE_DIRECTORIES(${DEPS_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DEPS_LIBRARY_DIRS})
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${potential-engine_SOURCES})
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES SUFFIX "_${CMAKE_SYSTEM_PROCESSOR}")
-endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES SUFFIX "_${CMAKE_SYSTEM_PROCESSOR}")
+endif (CMAKE_BUILD_TYPE STREQUAL "Release")
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${DEPS_LIBRARIES} -lm ${DEPS_LDFLAGS_OTHER})
 
-INSTALL (TARGETS potential-engine DESTINATION bin)
+INSTALL(TARGETS potential-engine DESTINATION bin)

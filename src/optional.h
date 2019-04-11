@@ -1,13 +1,15 @@
 #include <glib.h>
 #include <string>
 
+#include "pipe_builder.h"
+
 bool use_rpi_cam();
 
 int *rotation();
 
 bool *preview();
 
-bool *use_hw_encoder();
+V4L2Encoders selected_encoder();
 
 std::string v4l2_device();
 

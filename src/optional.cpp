@@ -18,6 +18,7 @@ int rot = 0;
 bool prev = false;
 // V4L2 options
 bool hw_encoder = false;
+bool cam_encoder = false;
 char *v4l2_dev = (char *) "/dev/video0";
 // common options
 int height = DEFAULT_RESOLUTION;
@@ -46,8 +47,9 @@ static GOptionEntry netEntries[]{
 GOptionGroup *netOpts = g_option_group_new("net", "Networking options", "Show networking options", nullptr, nullptr);
 
 static GOptionEntry v4l2Entries[]{
-        {"use_omx", 'o', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &hw_encoder, "Use OpenMAX hardware acceleration (default: false)", nullptr},
-        {"device",  'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_dev,   "Video4Linux2 device to use (default: /dev/video0)",  "DEVICE"},
+        {"use_omx",     'o', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &hw_encoder,  "Use OpenMAX hardware acceleration (default: false)",                                          nullptr},
+        {"camera_h264", 'c', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,   &cam_encoder, "Use camera-provided h.264 feed for higher-end cameras (e.g. Logitech C920) (default: false)", nullptr},
+        {"device",      'd', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &v4l2_dev,    "Video4Linux2 device to use (default: /dev/video0)",                                           "DEVICE"},
         {nullptr}
 };
 GOptionGroup *v4l2Opts = g_option_group_new("v4l2", "Video4Linux2 options", "Show Video4Linux2 options", nullptr,
@@ -73,7 +75,15 @@ int *rotation() { return &rot; }
 
 bool *preview() { return &prev; }
 
-bool *use_hw_encoder() { return &hw_encoder; }
+V4L2Encoders selected_encoder() {
+    if (cam_encoder) {
+        return V4L2Encoders::CAMERA_H264;
+    } else if (hw_encoder) {
+        return V4L2Encoders::OPENMAX;
+    } else {
+        return V4L2Encoders::SOFTWARE;
+    }
+}
 
 std::string v4l2_device() { return std::string(v4l2_dev); }
 
