@@ -30,7 +30,7 @@ std::string v4l2_pipe(const int *height, const int *framerate, const bool *openm
         encoder = "x264enc tune=zerolatency";
     }
     return fmt::format("v4l2src device={d} ! "
-                       "video/x-raw,height={h},framerate={f}/1 ! "
+                       "video/x-raw,height={h},framerate={f}/1,name=yuy ! "
                        "videoconvert ! "
                        "video/x-raw,format=I420 ! "
                        "{e} ! rtph264pay name=pay0",
