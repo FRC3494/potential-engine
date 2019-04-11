@@ -42,4 +42,5 @@ cmake ..
 make
 ```
 `make` will produce an executable named `potential-engine` in the `build` folder. (If you'd like to install the project to use it from any directory, run `sudo make install` instead of `make`.) To see what options are available, use `./potential-engine --help`.  
-Running with no options is functionally identical to `./potential-engine --address 0.0.0.0 --port 1181 --url /stream`. The server does not use the Raspberry Pi Camera Module or OpenMAX hardware acceleration unless explicity told to with `--rpi_cam` or `--use_omx` respectively.
+Running with no options is functionally identical to `./potential-engine --address 0.0.0.0 --port 1181 --url /stream`. The server does not use the Raspberry Pi Camera Module or OpenMAX hardware acceleration unless explicity told to with `--rpi_cam` or `--use_omx` respectively.  
+If you have a very nice camera (such as the [Logitech C920](https://www.logitech.com/en-us/product/hd-pro-webcam-c920s)) which outputs h.264 video natively, add the `--camera_h264` flag at runtime instead of `--use_omx`.
