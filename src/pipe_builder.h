@@ -13,11 +13,4 @@ std::string raspberry_pipe(const int *height,
                            const bool *preview
 );
 
-std::string v4l2_pipe(const int *height,
-                      const int *framerate,
-                      const bool *openmax,
-                      const std::string& device
-);
-
-
-std::string v4l2_pipe(const int *height, const int *framerate, V4L2Encoders encoder, const std::string& device);
+std::string v4l2_pipe(const int *height, const int *framerate, V4L2Encoders encoder, const std::string &device);
