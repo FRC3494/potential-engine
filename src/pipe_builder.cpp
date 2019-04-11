@@ -22,7 +22,7 @@ std::string raspberry_pipe(const int *height, const int *framerate, const int *r
     return pipeline;
 }
 
-std::string v4l2_pipe(const int *height, const int *framerate, const bool *openmax, const std::string device) {
+std::string v4l2_pipe(const int *height, const int *framerate, const bool *openmax, const std::string& device) {
     std::string encoder;
     if (*openmax) {
         encoder = "omxh264enc ! video/x-h264,profile=baseline";
@@ -38,7 +38,7 @@ std::string v4l2_pipe(const int *height, const int *framerate, const bool *openm
     );
 }
 
-std::string v4l2_pipe(const int *height, const int *framerate, const V4L2Encoders encoder, const std::string &device) {
+std::string v4l2_pipe(const int *height, const int *framerate, const V4L2Encoders encoder, const std::string& device) {
     std::string noFmtEnc;
     switch (encoder) {
         case V4L2Encoders::CAMERA_H264:
