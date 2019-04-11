@@ -37,3 +37,20 @@ std::string v4l2_pipe(const int *height, const int *framerate, const bool *openm
                        fmt::arg("h", *height), fmt::arg("f", *framerate), fmt::arg("e", encoder), fmt::arg("d", device)
     );
 }
+
+std::string v4l2_pipe(const int *height, const int *framerate, const V4L2Encoders encoder, std::string device) {
+    std::string noFmtEnc;
+    switch (encoder) {
+        case V4L2Encoders::CAMERA_H264:
+            noFmtEnc = "video/x-h264,height={h},framerate={f}/1 ! ";
+            break;
+        case V4L2Encoders::OPENMAX:
+            noFmtEnc = "video/x-raw,height={h},framerate={f}/1,name=yuy ! videoconvert ! video/x-raw,format=I420 ! omxh264enc ! video/x-h264,profile=baseline";
+            break;
+        case V4L2Encoders::SOFTWARE:
+            noFmtEnc = "video/x-raw,height={h},framerate={f}/1,name=yuy ! videoconvert ! x264enc tune=zerolatency";
+            break;
+    }
+    std::string enc = fmt::format(noFmtEnc, fmt::arg("h", *height), fmt::arg("f", *framerate));
+    return fmt::format("v4l2src device={d} ! {e} ! rtph264pay name=pay0", fmt::arg("d", device), fmt::arg("e", enc));
+}
