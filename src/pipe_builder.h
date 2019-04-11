@@ -17,4 +17,4 @@ std::string v4l2_pipe(const int *height,
 );
 
 
-std::string v4l2_pipe(const int *height, const int *framerate, V4L2Encoders encoder, std::string device);
+std::string v4l2_pipe(const int *height, const int *framerate, V4L2Encoders encoder, const std::string& device);
