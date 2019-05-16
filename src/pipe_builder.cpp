@@ -23,7 +23,7 @@ std::string raspberry_pipe(const int *height, const int *framerate, const int *r
 }
 
 std::string
-encoder_string(const int *height, const int *width, const int *framerate, const V4L2Encoders encoder,
+encoder_string(const int *height, const int *width, const int *framerate, const V4L2Encoders encoder, const bool shmem,
                const std::string &device) {
     std::string noFmtEnc;
     if (width == nullptr) {
@@ -39,7 +39,7 @@ encoder_string(const int *height, const int *width, const int *framerate, const 
                 break;
         }
         return fmt::format(noFmtEnc, fmt::arg("h", *height), fmt::arg("f", *framerate));
-    } else {
+    } else if (shmem) {
         // for shared memory
         switch (encoder) {
             case V4L2Encoders::CAMERA_H264:
@@ -49,15 +49,17 @@ encoder_string(const int *height, const int *width, const int *framerate, const 
                 noFmtEnc = "video/x-raw,format=I420,height={h},width={w},framerate={f}/1 !  omxh264enc ! video/x-h264,profile=baseline";
                 break;
             case V4L2Encoders::SOFTWARE:
-                noFmtEnc = "video/x-raw,format=I420,height={h},width={w},framerate={f}/1 ! x264enc tune=zerolatency";
+                noFmtEnc = "video/x-raw,format=I420,height={h},width={w},framerate={f}/1 ! queue ! x264enc tune=zerolatency";
                 break;
         }
         return fmt::format(noFmtEnc, fmt::arg("h", *height), fmt::arg("w", *width), fmt::arg("f", *framerate));
     }
+    // interestingly i am allowed to not return anything
+    // so that's nice
 }
 
 std::string v4l2_pipe(const int *height, const int *framerate, const V4L2Encoders encoder, const std::string &device) {
-    std::string enc = encoder_string(height, nullptr, framerate, encoder, device);
+    std::string enc = encoder_string(height, nullptr, framerate, encoder, false, device);
     return fmt::format("v4l2src device={d} ! {e} ! rtph264pay name=pay0", fmt::arg("d", device), fmt::arg("e", enc));
 }
 
@@ -68,7 +70,7 @@ std::string shm_pipe(const int *height, const int *width, const int *framerate, 
         // hmm no i don't believe it
         real_encoder = V4L2Encoders::SOFTWARE;
     }
-    std::string enc = encoder_string(height, width, framerate, real_encoder, device);
+    std::string enc = encoder_string(height, width, framerate, real_encoder, true, device);
     return fmt::format("shmsrc socket-path={d} ! {e} ! rtph264pay name=pay0", fmt::arg("d", device),
                        fmt::arg("e", enc));
 }
