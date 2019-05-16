@@ -46,7 +46,7 @@ encoder_string(const int *height, const int *width, const int *framerate, const 
                 noFmtEnc = "video/x-h264,height={h},width={w},framerate={f}/1";
                 break;
             case V4L2Encoders::OPENMAX:
-                noFmtEnc = "video/x-raw,format=I420,height={h},width={w},framerate={f}/1 ! videoconvert ! video/x-raw,format=I420 ! omxh264enc ! video/x-h264,profile=baseline";
+                noFmtEnc = "video/x-raw,format=I420,height={h},width={w},framerate={f}/1 !  omxh264enc ! video/x-h264,profile=baseline";
                 break;
             case V4L2Encoders::SOFTWARE:
                 noFmtEnc = "video/x-raw,format=I420,height={h},width={w},framerate={f}/1 ! x264enc tune=zerolatency";
@@ -69,6 +69,6 @@ std::string shm_pipe(const int *height, const int *width, const int *framerate, 
         real_encoder = V4L2Encoders::SOFTWARE;
     }
     std::string enc = encoder_string(height, width, framerate, real_encoder, device);
-    return fmt::format("shmsrc socket-path={d} do-timestamp=1 is-live=1 ! {e} ! rtph264pay name=pay0", fmt::arg("d", device),
+    return fmt::format("shmsrc socket-path={d} ! {e} ! rtph264pay name=pay0", fmt::arg("d", device),
                        fmt::arg("e", enc));
 }
