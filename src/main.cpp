@@ -56,11 +56,14 @@ int main(int argc, char *argv[]) {
 
     std::string pipeline;
 
-    gboolean rpi = use_rpi_cam();
-    if (rpi) {
-        pipeline = raspberry_pipe(video_height(), framerate(), rotation(), preview());
-    } else {
-        pipeline = v4l2_pipe(video_height(), framerate(), selected_encoder(), v4l2_device());
+    VideoSources video_type = input_type();
+    switch (video_type) {
+        case VideoSources::RASP:
+            pipeline = raspberry_pipe(video_height(), framerate(), rotation(), preview());
+        case VideoSources::V4L2:
+            pipeline = v4l2_pipe(video_height(), framerate(), selected_encoder(), video_device());
+        case VideoSources::SHMEM:
+            pipeline = shm_pipe(video_height(), video_width(), framerate(), selected_encoder(), video_device());
     }
 
     g_print("Starting pipeline: %s\n", pipeline.c_str());

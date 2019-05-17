@@ -3,7 +3,7 @@
 
 #include "pipe_builder.h"
 
-bool use_rpi_cam();
+VideoSources input_type();
 
 int *rotation();
 
@@ -11,9 +11,11 @@ bool *preview();
 
 V4L2Encoders selected_encoder();
 
-std::string v4l2_device();
+std::string video_device();
 
 int *video_height();
+
+int *video_width();
 
 int *framerate();
 
