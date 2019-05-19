@@ -60,10 +60,13 @@ int main(int argc, char *argv[]) {
     switch (video_type) {
         case VideoSources::RASP:
             pipeline = raspberry_pipe(video_height(), framerate(), rotation(), preview());
+            break;
         case VideoSources::V4L2:
             pipeline = v4l2_pipe(video_height(), framerate(), selected_encoder(), video_device());
+            break;
         case VideoSources::SHMEM:
             pipeline = shm_pipe(video_height(), video_width(), framerate(), selected_encoder(), video_device());
+            break;
     }
 
     g_print("Starting pipeline: %s\n", pipeline.c_str());
