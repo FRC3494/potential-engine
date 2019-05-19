@@ -26,7 +26,7 @@ std::string
 encoder_string(const int *height, const int *width, const int *framerate, const V4L2Encoders encoder, const bool shmem,
                const std::string &device) {
     std::string noFmtEnc;
-    if (width == nullptr) {
+    if (!shmem) {
         switch (encoder) {
             case V4L2Encoders::CAMERA_H264:
                 noFmtEnc = "video/x-h264,height={h},framerate={f}/1";
@@ -39,8 +39,7 @@ encoder_string(const int *height, const int *width, const int *framerate, const 
                 break;
         }
         return fmt::format(noFmtEnc, fmt::arg("h", *height), fmt::arg("f", *framerate));
-    } else if (shmem) {
-        // for shared memory
+    } else {
         switch (encoder) {
             case V4L2Encoders::CAMERA_H264:
                 noFmtEnc = "video/x-h264,height={h},width={w},framerate={f}/1";
@@ -54,8 +53,6 @@ encoder_string(const int *height, const int *width, const int *framerate, const 
         }
         return fmt::format(noFmtEnc, fmt::arg("h", *height), fmt::arg("w", *width), fmt::arg("f", *framerate));
     }
-    // interestingly i am allowed to not return anything
-    // so that's nice
 }
 
 std::string v4l2_pipe(const int *height, const int *framerate, const V4L2Encoders encoder, const std::string &device) {
