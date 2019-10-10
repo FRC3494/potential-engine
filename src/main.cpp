@@ -1,5 +1,3 @@
-#include <map>
-#include <fmt/core.h>
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
 
@@ -55,7 +53,6 @@ int main(int argc, char *argv[]) {
     gst_rtsp_server_set_service(server, std::to_string(*port()).c_str());
 
     std::string pipeline;
-
     VideoSources video_type = input_type();
     switch (video_type) {
         case VideoSources::RASP:
@@ -72,10 +69,10 @@ int main(int argc, char *argv[]) {
     g_print("Starting pipeline: %s\n", pipeline.c_str());
     gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
     gst_rtsp_media_factory_set_shared(factory, true);
-    std::string m = mount();
-    const char *mount_cstr = m.c_str();
-    g_print("Mounting to %s\n", mount_cstr);
-    gst_rtsp_mount_points_add_factory(mounts, mount_cstr, factory);
+
+    std::string stream_url = mount();
+    g_print("Mounting to %s\n", stream_url.c_str());
+    gst_rtsp_mount_points_add_factory(mounts, stream_url.c_str(), factory);
     // free thing we're no longer using
     g_object_unref(mounts);
     // start rtsp server, ignoring errors
@@ -91,7 +88,7 @@ int main(int argc, char *argv[]) {
             exit(EADDRNOTAVAIL);
         }
     }
-    g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), mount_cstr);
+    g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), stream_url.c_str());
     {
         bool b = judgemental();
         if (b) {
