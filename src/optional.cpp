@@ -29,13 +29,12 @@ int fps = DEFAULT_FPS;
 // network
 char *addr = (char *) "0.0.0.0";
 int port_ = DEFAULT_RTSP_PORT;
-const char *url = nullptr;
+const char *url = DEFAULT_MOUNT;
 
 GOptionEntry entries[] = {
         {"rpi_cam",       'r', G_OPTION_FLAG_NONE,   G_OPTION_ARG_NONE, &rpi_cam_flag, "Use Raspberry Pi Camera module (default: false)",                                           nullptr},
         {"shared_memory", 's', G_OPTION_FLAG_NONE,   G_OPTION_ARG_NONE, &shared_mem,   "Read frames from shared memory (default: false)"},
-        {"fps",           'f', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &fps,          "Framerate in FPS (default: " STRINGIFY(
-                DEFAULT_FPS) ")",                                                                                                                                                   "FPS"},
+        {"fps",           'f', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &fps,          "Framerate in FPS (default: 30)",                                                            "FPS"},
         {"height",        'h', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &height,       "Video height. Should be a standard resolution (in [240, 360, 480, 720] for most cameras.)", "HEIGHT"},
         {"width",         'w', G_OPTION_FLAG_NONE,   G_OPTION_ARG_INT,  &width,        "Video width. Only needs to be specified if you're using shared memory.",                    "WIDTH"},
         {"judge",         '9', G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, &judge,        "",                                                                                          nullptr},
@@ -44,8 +43,7 @@ GOptionEntry entries[] = {
 
 static GOptionEntry netEntries[]{
         {"address", 'a', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &addr,  "Network address to bind to (default: 0.0.0.0)",       "ADDRESS"},
-        {"port",    'p', G_OPTION_FLAG_NONE, G_OPTION_ARG_INT,    &port_, "Port to listen on (default: " STRINGIFY(
-                DEFAULT_RTSP_PORT) ")",                                                                                          "PORT"},
+        {"port",    'p', G_OPTION_FLAG_NONE, G_OPTION_ARG_INT,    &port_, "Port to listen on (default: 1181)",                   "PORT"},
         {"url",     'u', G_OPTION_FLAG_NONE, G_OPTION_ARG_STRING, &url,   "URL to stream video at (default: " DEFAULT_MOUNT ")", "URL"},
         {nullptr}
 };
@@ -121,7 +119,7 @@ std::string mount() {
             return ret;
         }
     } else {
-        return std::string(DEFAULT_MOUNT);
+        return DEFAULT_MOUNT;
     }
 }
 
