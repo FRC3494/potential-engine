@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
             g_printerr(
                     "Port %d did not bind properly. Check that this machine owns the IPv4 address %s and that %d is not bound.\n",
                     goal_port, addr, goal_port);
-            exit(EADDRNOTAVAIL);
+            return EADDRNOTAVAIL;
         }
     }
     g_print("stream starting at rtsp://%s:%d%s\n", addr, gst_rtsp_server_get_bound_port(server), stream_url.c_str());
