@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 set(CMAKE_CXX_STANDARD 11)
 
-PROJECT(potential-engine)
+PROJECT(potential-engine
+    VERSION 1.3.2
+    DESCRIPTION "Simple RTSP server designed for the FIRST Robotics Competition"
+    HOMEPAGE_URL "https://github.com/BHSSFRC/potential-engine")
 
 AUX_SOURCE_DIRECTORY(src potential-engine_SOURCES)
 
